@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "300kpersecondbot"
+version = "0.1.0"
+description = ""
+authors = ["torchme <redpowerfuls@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+aiogram = "^3.4.1"
+loguru = "^0.7.2"
+prefect = "^2.16.9"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
