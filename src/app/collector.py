@@ -1,5 +1,6 @@
-import requests
 import xml.etree.ElementTree as ET
+
+import requests
 from scholarly import scholarly
 from tqdm import tqdm
 
