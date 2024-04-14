@@ -38,6 +38,8 @@ services:
             - "8501:8501"
         environment:
             DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+            APP_TOKEN: ${APP_TOKEN}
+            PREFECT_API_KEY: ${PREFECT_API_KEY}
         volumes:
             - assist_data:/var/lib/assist_data
         networks:
