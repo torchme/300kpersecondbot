@@ -1,11 +1,17 @@
-FROM python:3.11.6
+FROM python:3.10
+
+ARG PREFECT_API_KEY
+ARG PREFECT_WORKSPACE_ID
+
+ENV PREFECT_API_KEY=${PREFECT_API_KEY}
+ENV PREFECT_WORKSPACE_ID=${PREFECT_WORKSPACE_ID}
 
 WORKDIR /app
 
-COPY . /app
+COPY ../ /app
 
-RUN pip install poetry
+RUN make install
 
-RUN poetry install
+# RUN make auth
 
-RUN chmod +x /app/app.sh
+# RUN make run

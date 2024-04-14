@@ -1,12 +1,23 @@
-import psycopg2
 import datetime
-from src.config.config import DATABASE_URL
+
+import psycopg2
+from loguru import logger
 
 
 class PostgresManager:
+    """
+    Postgres manager class.
+    """
+
+    def __init__(self, conn_db):
+        self.conn_db = conn_db
+
     def create_tables(self):
+        """
+        Create tables in the database.
+        """
         try:
-            with psycopg2.connect(DATABASE_URL) as conn:
+            with psycopg2.connect(**self.conn_db) as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(
                         """
@@ -33,13 +44,16 @@ class PostgresManager:
                         """
                     )
                     conn.commit()
-                    print("Tables created successfully.")
-        except (Exception, psycopg2.DatabaseError) as error:
-            print(f"Error creating tables: {error}")
+                    logger.success("Tables created successfully.")
+        except psycopg2.DatabaseError as error:
+            logger.error(f"Error creating tables: {error}")
 
     def insert_data(self, data):
+        """
+        Insert data into the database.
+        """
         try:
-            with psycopg2.connect(DATABASE_URL) as conn:
+            with psycopg2.connect(**self.conn_db) as conn:
                 with conn.cursor() as cursor:
                     for item in data:
                         cursor.execute(
@@ -72,17 +86,20 @@ class PostgresManager:
                                     (author, article_id),
                                 )
                     conn.commit()
-        except (Exception, psycopg2.DatabaseError) as error:
-            print(f"Error inserting data: {error}")
+        except psycopg2.DatabaseError as error:
+            logger.error(f"Error inserting data: {error}")
             if conn:
                 conn.rollback()
 
-    def fetch_top_articles_by_indexes(self, n=10, days=7):
+    def top_articles(self, num_published=10, days=7):
+        """
+        Fetch top articles by indexes from the database.
+        """
         end_date = datetime.datetime.now()
         start_date = end_date - datetime.timedelta(days=days)
 
         try:
-            with psycopg2.connect(DATABASE_URL) as conn:
+            with psycopg2.connect(**self.conn_db) as conn:
                 with conn.cursor() as cursor:
                     query = """
                     SELECT * FROM articles
@@ -90,17 +107,10 @@ class PostgresManager:
                     ORDER BY i10_index DESC, h_index DESC
                     LIMIT %s;
                     """
-                    cursor.execute(query, (start_date, end_date, n))
+                    cursor.execute(query, (start_date, end_date, num_published))
                     articles = cursor.fetchall()
-                    print("Fetched articles successfully.")
+                    logger.success("Fetched articles successfully.")
                     return articles
-        except (Exception, psycopg2.DatabaseError) as error:
-            print(f"Error fetching articles: {error}")
+        except psycopg2.DatabaseError as error:
+            logger.error(f"Error fetching articles: {error}")
             return []
-
-
-# Example usage
-# conn_params = {'host': 'localhost', 'database': 'your_database', 'user': 'your_username', 'password': 'your_password'}
-# manager = PostgresManager(conn_params)
-# top_articles = manager.fetch_top_articles_by_indexes(n=5, days=7)
-# print(top_articles)

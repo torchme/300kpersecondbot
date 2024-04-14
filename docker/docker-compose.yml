@@ -5,6 +5,8 @@ services:
         container_name: pg_container
         image: postgres
         restart: always
+        env_file:
+            - ../.env
         environment:
             POSTGRES_USER: ${POSTGRES_USER}
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -33,17 +35,34 @@ services:
 
     assist_service:
         container_name: arxiv_service
-        build: .
+        build:
+            context: ../
+            dockerfile: docker/Dockerfile
+            args:
+                - PREFECT_API_KEY=${PREFECT_API_KEY}
+                - PREFECT_WORKSPACE_ID=${PREFECT_WORKSPACE_ID}
         ports:
             - "8501:8501"
+        env_file:
+            - ../.env
         environment:
-            DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-            APP_TOKEN: ${APP_TOKEN}
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_DB: ${POSTGRES_DB}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            TG_TOKEN: ${TG_TOKEN}
             PREFECT_API_KEY: ${PREFECT_API_KEY}
+            CHAT_ID: ${CHAT_ID}
         volumes:
             - assist_data:/var/lib/assist_data
         networks:
             - postgres
+        entrypoint: /bin/bash
+        command:
+            - -c
+            - |
+                source /app/.env &&
+                make auth &&
+                make run
 
 volumes:
     postgres:

@@ -22,56 +22,37 @@ pre-commit = "^3.7.0"
 ruff = "^0.3.5"
 pytest = "^8.1.1"
 ipykernel = "^6.29.4"
+autopep8 = "^2.1.0"
 
 [tool.ruff]
-exclude = [
-    "**/__init__.py",
-    ".bzr",
-    ".direnv",
-    ".eggs",
-    ".git",
-    ".git-rewrite",
-    ".hg",
-    ".ipynb_checkpoints",
-    ".mypy_cache",
-    ".nox",
-    ".pants.d",
-    ".pyenv",
-    ".pytest_cache",
-    ".pytype",
-    ".ruff_cache",
-    ".svn",
-    ".tox",
-    ".venv",
-    ".vscode",
-    "__pypackages__",
-    "_build",
-    "buck-out",
-    "build",
-    "dist",
-    "node_modules",
-    "site-packages",
-    ".venv",
-    ".csv"
-]
-
+extend-include = ["*.ipynb"]
+include = ["*.py"]
 line-length = 88
-indent-width = 4
-
-target-version = "py38"
+target-version = "py310"
+fix = true
+preview = true
 
 [tool.ruff.lint]
-select = ["E4", "E7", "E9", "F"]
+select = ["E4", "E7", "E9", "F", "I"]
 ignore = []
 fixable = ["ALL"]
 unfixable = []
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 [tool.ruff.format]
+exclude = ["*.ipynb"]
 quote-style = "double"
 indent-style = "space"
+docstring-code-format = true
 skip-magic-trailing-comma = false
+docstring-code-line-length = "dynamic"
 line-ending = "auto"
+
+[tool.ruff.lint.isort]
+case-sensitive = true
+
+[tool.ruff.lint.flake8-quotes]
+docstring-quotes = "double"
 
 [build-system]
 requires = ["poetry-core"]
