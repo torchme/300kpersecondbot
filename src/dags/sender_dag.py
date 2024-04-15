@@ -1,3 +1,4 @@
+from aiogram.utils.markdown import hbold, hlink
 from loguru import logger
 from prefect import flow, task
 
@@ -8,17 +9,34 @@ from src.config.config import CHAT_ID
 bot_runner = PerSecond300kBot()
 
 
+def escape_markdown_v2(text):
+    """
+    Escapes characters for MarkdownV2.
+    """
+    escape_chars = "_*[]()~`>#+-=|{}.!"
+    return "".join(f"\\{char}" if char in escape_chars else char for char in text)
+
+
 @task
 async def send_articles_task():
     articles = pg_manager.top_articles(num_published=5, days=7)
     if not articles:
-        response = "No articles found."
+        response = "На этой неделе пока нет статей на ARXIV 😢"
     else:
-        response = "\n\n".join([
-            f"Title: {article['title']}\nPublished: {article['date']}\nLink: {article['link']}"
-            for article in articles
-        ])
+        response = (
+            f"{hbold('📦 ПЯТНИЧНЫЙ ARXIV 📚')}\n\n" "Лучшие статьи за эту неделю:\n\n"
+        )
 
+        for index, article in enumerate(articles, 1):
+            title = article[1]
+            link = article[4]
+            response += f"{index}️⃣ {hlink(title, link)}\n"
+
+        response += (
+            f"\n{hlink('🗳 Отдать голос', 'https://t.me/boost/persecond300k')}\n\n"
+            f"{hlink('💬 Вступить в чат', 'https://t.me/persecond300kchat')}"
+        )
+        logger.info(response)
     await bot_runner.send_message(CHAT_ID, response)
 
 

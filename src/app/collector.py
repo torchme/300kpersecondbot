@@ -19,7 +19,7 @@ class Collector:
             i10_index = author.get("i10index", 0)
             return h_index, i10_index
         except StopIteration:
-            logger.error("Author not found")
+            logger.warning(f"Author not found: {author_name}")
             return 0, 0
         except Exception as exception:
             logger.error(f"An error occurred: {exception}")
