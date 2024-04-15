@@ -9,7 +9,7 @@ from src.app.loader import pg_manager
 def fetch_data():
     collector = Collector()
     # TODO: add theme of article
-    articles = collector.fetch_arxiv_papers("machine learning", max_results=50)
+    articles = collector.fetch_arxiv_papers("machine learning", max_results=2)
     logger.info("Collected articles successfully.")
     return articles
 
@@ -18,14 +18,14 @@ def fetch_data():
 def load_to_db(articles):
     pg_manager.insert_data(articles)
     logger.info("Loaded articles into the database successfully.")
-    return len(articles)
+    return True
 
 
 @flow
 def weekly_data_collection_flow():
     articles = fetch_data()
-    num_inserted = load_to_db(articles)
-    logger.success(f"Inserted {len(num_inserted)} new articles into the database.")
+    load_to_db(articles)
+    logger.success("Inserted new articles into the database.")
 
 
 if __name__ == "__main__":

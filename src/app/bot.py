@@ -33,7 +33,7 @@ class PerSecond300kBot:
         """
         Asynchronous function to send articles to the user.
         """
-        await bot.send_message(chat_id, response)
+        await bot.send_message(chat_id, response, parse_mode="HTML")
         logger.info("Sending articles")
 
     async def shutdown_event(self):

@@ -1,8 +1,8 @@
 version: '3.1'
 
 services:
-    db:
-        container_name: pg_container
+    postgresdb:
+        container_name: postgresdb
         image: postgres
         restart: always
         env_file:
@@ -10,6 +10,7 @@ services:
         environment:
             POSTGRES_USER: ${POSTGRES_USER}
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_HOST: ${POSTGRES_HOST}
             POSTGRES_DB: ${POSTGRES_DB}
             PGDATA: /data/postgres
         volumes:
@@ -32,6 +33,8 @@ services:
             - "5050:80"
         networks:
             - postgres
+        depends_on:
+            - db
 
     assist_service:
         container_name: arxiv_service
@@ -48,10 +51,11 @@ services:
         environment:
             POSTGRES_USER: ${POSTGRES_USER}
             POSTGRES_DB: ${POSTGRES_DB}
+            POSTGRES_HOST: ${POSTGRES_HOST}
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
             TG_TOKEN: ${TG_TOKEN}
-            PREFECT_API_KEY: ${PREFECT_API_KEY}
             CHAT_ID: ${CHAT_ID}
+            PREFECT_API_KEY: ${PREFECT_API_KEY}
         volumes:
             - assist_data:/var/lib/assist_data
         networks:
@@ -63,6 +67,8 @@ services:
                 source /app/.env &&
                 make auth &&
                 make run
+        depends_on:
+            - postgresdb
 
 volumes:
     postgres:
