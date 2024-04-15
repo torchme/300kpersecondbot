@@ -1,35 +1,34 @@
-from datetime import timedelta
-
+from loguru import logger
 from prefect import flow, task
-from prefect.schedules import IntervalSchedule
 
 from src.app.collector import Collector
-from src.database.postgres_manager import PostgresManager
-
-schedule = IntervalSchedule(interval=timedelta(days=1))
+from src.app.loader import pg_manager
 
 
 @task
 def fetch_data():
     collector = Collector()
-    # TODO: Read from config file querys [machine learning]
+    # TODO: add theme of article
     articles = collector.fetch_arxiv_papers("machine learning", max_results=50)
+    logger.info("Collected articles successfully.")
     return articles
 
 
 @task
-def insert_data(articles):
-    manager = PostgresManager()
-    manager.insert_data(articles)
+def load_to_db(articles):
+    pg_manager.insert_data(articles)
+    logger.info("Loaded articles into the database successfully.")
     return len(articles)
 
 
-@flow(name="Daily ArXiv Data Collection", schedule=schedule, log_prints=True)
+@flow
 def weekly_data_collection_flow():
     articles = fetch_data()
-    num_inserted = insert_data(articles)
-    print(f"Inserted {num_inserted} new articles into the database.")
+    num_inserted = load_to_db(articles)
+    logger.success(f"Inserted {len(num_inserted)} new articles into the database.")
 
 
 if __name__ == "__main__":
-    weekly_data_collection_flow()
+    weekly_data_collection_flow.serve(
+        name="ArXiv Data Collector", tags=["arxiv"], cron="31 21 * * *"
+    )

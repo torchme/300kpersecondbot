@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 
 import requests
+from loguru import logger
 from scholarly import scholarly
 from tqdm import tqdm
 
@@ -18,10 +19,10 @@ class Collector:
             i10_index = author.get("i10index", 0)
             return h_index, i10_index
         except StopIteration:
-            print("Author not found")
+            logger.error("Author not found")
             return 0, 0
-        except Exception as e:
-            print(f"An error occurred: {e}")
+        except Exception as exception:
+            logger.error(f"An error occurred: {exception}")
             return 0, 0
 
     def fetch_arxiv_papers(self, query, max_results=10):
@@ -30,7 +31,7 @@ class Collector:
 
         response = requests.get(url)
         if response.status_code != 200:
-            print(f"Ошибка при запросе: {response.status_code}")
+            logger.error(f"Ошибка при запросе: {response.status_code}")
             return None
 
         root = ET.fromstring(response.content)
