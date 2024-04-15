@@ -9,14 +9,6 @@ from src.config.config import CHAT_ID
 bot_runner = PerSecond300kBot()
 
 
-def escape_markdown_v2(text):
-    """
-    Escapes characters for MarkdownV2.
-    """
-    escape_chars = "_*[]()~`>#+-=|{}.!"
-    return "".join(f"\\{char}" if char in escape_chars else char for char in text)
-
-
 @task
 async def send_articles_task():
     articles = pg_manager.top_articles(num_published=5, days=7)
@@ -24,7 +16,7 @@ async def send_articles_task():
         response = "На этой неделе пока нет статей на ARXIV 😢"
     else:
         response = (
-            f"{hbold('📦 ПЯТНИЧНЫЙ ARXIV 📚')}\n\n" "Лучшие статьи за эту неделю:\n\n"
+            f"{hbold('📦 ПЯТНИЧНЫЙ ARXIV 📚')}\n\n" "Лучшие статьи за эту неделю:\n"
         )
 
         for index, article in enumerate(articles, 1):
