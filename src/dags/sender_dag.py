@@ -20,15 +20,15 @@ async def send_articles_task():
         ])
 
     await bot_runner.send_message(CHAT_ID, response)
-    logger.info("Articles sent successfully.")
 
 
 @flow
 def article_sender_flow():
     send_articles_task()
+    logger.success("Articles sent successfully.")
 
 
 if __name__ == "__main__":
     article_sender_flow.serve(
-        name="Weekly Article Sender", tags=["arxiv"], cron="55 20 * * *"
+        name="Telegram Sender Arxiv", tags=["arxiv", "telegram"], cron="55 20 * * *"
     )

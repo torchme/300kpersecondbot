@@ -9,4 +9,4 @@ auth:
 	poetry run prefect cloud login --key $(PREFECT_API_KEY) --workspace $(PREFECT_WORKSPACE_ID)
 
 run:
-	poetry run python -m src.app.bot & poetry run python -m src.dags.sender_dag
+	poetry run sh commands/prefect.sh
